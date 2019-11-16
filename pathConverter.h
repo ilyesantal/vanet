@@ -30,9 +30,11 @@ float* createPoints(Node *nodes, Segment segment, int *prevend, int *addedPoints
     speed[5] = 22.0*5.0/18.0;
     speed[6] = 18.0*5.0/18.0;
 
+    int t = segment.type;
+
     //How many points to add
-    points = *addedPoints = (int) floor(length/speed[segment.type]);   //Also the time (in s) required for the segment
-    time = *timeRequired = length/speed[segment.type];
+    points = *addedPoints = (int) floor(length/speed[t]);   //Also the time (in s) required for the segment
+    time = *timeRequired = length/speed[t];
 
     //Creating unit vector
     ex = x/time;

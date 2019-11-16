@@ -1,6 +1,7 @@
 cluster.nod
 cluster.sgm
 map.pth
-Cars 10
-Jump 2
-Rnd 100
+Cars_in_simulation 10
+Jump_in_paths 2
+Random_parameter 100
+TMax 1000

@@ -9,14 +9,14 @@ typedef struct {
 typedef struct {
 float x; // x coordinate of the node
 float y; // y coordinate of the node
-char NumSegm; // Number of connected road segments at the given node
+unsigned short NumSegm; // Number of connected road segments at the given node
 unsigned short* SgmList; // List of IDs of connected segments
 } Node;
 
 typedef struct {
 unsigned short N1; // One of the endpoints (node ID)
 unsigned short N2; // Other endpoint (node ID)
-char type; // Type of segment
+unsigned short type; // Type of segment
 } Segment;
 
 typedef struct {

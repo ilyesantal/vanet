@@ -22,10 +22,10 @@ Car getNextCar(int carsInSim, FILE** paths, Node* nodes, Segment* segments, int 
     fscanf(*paths, "\n%hu\n%hu", &path.Start, &path.NSegm);
     //printf("%hu, %hu\n", path.Start, path.NSegm);
     path.SgmList = malloc(path.NSegm*sizeof(unsigned short));
-    /*for (i=0; i<path.NSegm; i++){
+    for (i=0; i<path.NSegm; i++){
         fscanf(*paths,"\t%hu", &path.SgmList[i]);
     }
-    printf("\n");*/
+    //printf("\n");
 
     car.PathXY = convertPath(&path, nodes, segments);
     car.Pos = 0;

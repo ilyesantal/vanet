@@ -6,7 +6,8 @@
 
 int main()
 {
-    int i, carsInSim, jmp, rnd;
+    int t, i, j, carsInSim, jmp, rnd, TMax;
+    float xMax, xMin, yMax, yMin, R;
 
     char pth[20];
 
@@ -16,7 +17,7 @@ int main()
 
     FILE* paths;
 
-    readInputs(&NODES, &SEGMENTS, &carsInSim, pth, &jmp, &rnd);
+    readInputs(&NODES, &SEGMENTS, &carsInSim, pth, &jmp, &rnd, &TMax, &xMax, &xMin, &yMax, &yMin, &R);
 
     srand(rnd);
 
@@ -27,10 +28,23 @@ int main()
 
     CARS = malloc(sizeof(Car) * carsInSim);
 
-    //printf("%d\n%d\n", carsInSim, jmp);
+    for(j = 0; j < carsInSim; j++){
+        CARS[j] = getNextCar(carsInSim, &paths, NODES, SEGMENTS, jmp);
+    }
 
-    for(i = 0; i < carsInSim; i++){
-        CARS[i] = getNextCar(carsInSim, &paths, NODES, SEGMENTS, jmp);
+    for(t = -500; t < TMax; t++){
+        for(j = 0; j < carsInSim; j++){
+            if(CARS[j].Pos == CARS[j].PathLen){
+                CARS[j] = getNextCar(carsInSim, &paths, NODES, SEGMENTS, jmp);
+            }
+            CARS[j].Pos++;
+        }
+
+        if(t == 0){
+            CARS[0].ITS=0;
+            CARS[0].IPos[0]=CARS[0].PathXY[2*CARS[0].Pos];
+            CARS[0].IPos[1]=CARS[0].PathXY[2*CARS[0].Pos+1];
+        }
     }
 
     fclose(paths);

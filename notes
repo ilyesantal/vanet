@@ -1,0 +1,1 @@
+A struktúrákban a char típusú változókat átírtam unsigne char-ra, a könnyebb kezelhetőség miatt (+ a fordító kevésbé sír)

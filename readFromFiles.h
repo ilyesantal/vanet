@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 
 Path* readPth(char* filename, int* pathCount)
 {
@@ -53,13 +54,14 @@ Path* readPth(char* filename, int* pathCount)
     return paths;
 }
 
-Node* readNod(char* filename)
+Node* readNod(char* filename, float* xMa, float* xMi, float* yMa, float* yMi)
 {
     //Declarations
     Node puff;
     Node* nodes;
     int i, bSize = 100;
     int NodeCount = 0;
+    float xMax = FLT_MIN, yMax = FLT_MIN, xMin = FLT_MAX, yMin = FLT_MAX;
 
     FILE* f;
 
@@ -74,11 +76,16 @@ Node* readNod(char* filename)
     nodes = malloc(bSize*sizeof(Node));
 
     //Reading the lines from input file to a buffer
-    while((fscanf(f, "\n%f\t%f\t%d", &puff.x, &puff.y, &puff.NumSegm)) != EOF)
+    while((fscanf(f, "\n%f\t%f\t%hu", &puff.x, &puff.y, &puff.NumSegm)) != EOF)
     {
         puff.SgmList = malloc(puff.NumSegm*sizeof(unsigned short));
         for (i=0; i<puff.NumSegm; i++)
             fscanf(f,"\t%hu", puff.SgmList + i);
+
+        if(puff.x > xMax) xMax = puff.x;
+        if(puff.x < xMin) xMin = puff.x;
+        if(puff.y > yMax) yMax = puff.y;
+        if(puff.y < yMin) yMin = puff.y;
 
         /*printf("\n%d\t%f\t%f\t%hu", NodeCount, puff.x, puff.y, puff.NumSegm);
         for (i=0;i<puff.NumSegm;i++)
@@ -97,6 +104,11 @@ Node* readNod(char* filename)
     }
 
     fclose(f);
+
+    *yMa = yMax;
+    *yMi = yMin;
+    *xMa = xMax;
+    *xMi = xMin;
 
     return nodes;
 }
@@ -121,7 +133,7 @@ Segment* readSgm(char* filename)
     segments = malloc(bSize*sizeof(Segment));
 
     //Reading the lines from input file to a buffer
-    while((fscanf(f, "%hu\t%hu\t%c\n", &puff.N1, &puff.N2, &puff.type)) != EOF)
+    while((fscanf(f, "%hu\t%hu\t%hu\n", &puff.N1, &puff.N2, &puff.type)) != EOF)
     {
 
         /*printf("%d\t%d\t%d\t%d\n", SegmentCount, puff.N1, puff.N2, puff.type);*/
@@ -145,7 +157,7 @@ Segment* readSgm(char* filename)
     return segments;
 }
 
-void readInputs(Node** nodes, Segment** segments, int* carsInSim, char* pth, int* jmp, int* rnd){
+void readInputs(Node** nodes, Segment** segments, int* carsInSim, char* pth, int* jmp, int* rnd, int* TMax,  float* xMa, float* xMi, float* yMa, float* yMi){
     FILE* fin;
 
     char nod[20], sgm[20];
@@ -158,12 +170,12 @@ void readInputs(Node** nodes, Segment** segments, int* carsInSim, char* pth, int
 
     char trash[100];
 
-    fscanf(fin,"%s\n%s\n%s\n%s%d\n%s%d\n%s%d\n", nod, sgm, pth, trash, carsInSim, trash, jmp, trash, rnd);
+    fscanf(fin,"%s\n%s\n%s\n%s%d\n%s%d\n%s%d\n%s%d\n", nod, sgm, pth, trash, carsInSim, trash, jmp, trash, rnd, trash, TMax);
 
     //printf("%s\n%s\n%s\n%d\n%d\n", nod, sgm, pth, *carsInSim, *jmp);
 
     fclose(fin);
 
-    *nodes = readNod(nod);
+    *nodes = readNod(nod, xMa, xMi, yMa, yMi);
     *segments = readSgm(sgm);
 }
