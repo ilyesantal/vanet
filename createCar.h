@@ -16,7 +16,10 @@ Car getNextCar(int carsInSim, FILE** paths, Node* nodes, Segment* segments, int 
 
 
     for(i = 0; i < m; i++){
-        getline(&line, &len, *paths);
+        if(!getline(&line, &len, *paths)){
+            fseek(*paths, 0, SEEK_SET);
+            i--;
+        }
     }
 
     fscanf(*paths, "\n%hu\n%hu", &path.Start, &path.NSegm);
@@ -39,3 +42,5 @@ Car getNextCar(int carsInSim, FILE** paths, Node* nodes, Segment* segments, int 
 
     return car;
 }
+
+

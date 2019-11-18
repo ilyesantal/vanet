@@ -46,3 +46,29 @@
 1573909427 /home/antimanti/Project/vanet/pathConverter.h
 	<math.h>
 
+1574108287 source:/home/anti/Project/vanet/main.c
+	"traffic.h"
+
+1574098412 /home/anti/Project/vanet/structs.h
+
+1574104838 /home/anti/Project/vanet/readFromFiles.h
+	<stdio.h>
+	<stdlib.h>
+	<float.h>
+
+1574107223 /home/anti/Project/vanet/createCar.h
+	"pathConverter.h"
+	<sys/types.h>
+	<stdlib.h>
+
+1574107283 /home/anti/Project/vanet/pathConverter.h
+	<math.h>
+
+1574109103 /home/anti/Project/vanet/traffic.h
+	<stdio.h>
+	<stdlib.h>
+	<float.h>
+	<math.h>
+	<sys/types.h>
+	"structs.h"
+

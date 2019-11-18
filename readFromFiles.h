@@ -2,66 +2,14 @@
 #include <stdlib.h>
 #include <float.h>
 
-Path* readPth(char* filename, int* pathCount)
-{
-    //Declarations
-    Path puff;
-    Path* paths;
-    int i, bSize = 100;
-
-    FILE* f;
-
-    //Opening the file
-    if( (f = fopen(filename, "r")) == NULL)
-    {
-        fprintf(stderr, "No such file!");
-        exit(1);
-    }
-
-    //Allocating memory for *MaxSize* paths
-    paths = malloc(bSize*sizeof(Path));
-
-    //Reading the lines from input file to a buffer
-    while((fscanf(f, "\n%hu\n%hu", &puff.Start, &puff.NSegm)) != EOF)
-    {
-        //Checking if the allocated memory is enough, and if not, increasing the allocated space
-        if(*pathCount > bSize - 1){
-            bSize += 100;
-            realloc(paths, bSize);
-        }
-
-        printf("NSegm: %d\n", puff.NSegm);
-        puff.SgmList = malloc(puff.NSegm*sizeof(unsigned short));
-
-        for (i=0; i<puff.NSegm; i++)
-            fscanf(f,"\t%hu", puff.SgmList + i);
-
-        /*printf("\n%d\t%d", puff.Start, puff.NSegm);
-        for (i=0;i<puff.NSegm;i++)
-            printf("\t%d",puff.SgmList[i]);*/
-
-
-        //Copying the path from puffer to the allocated memory
-        paths[*pathCount] = puff;
-
-        free(puff.SgmList);
-
-        (*pathCount)++;
-    }
-
-    fclose(f);
-
-    return paths;
-}
-
-Node* readNod(char* filename, float* xMa, float* xMi, float* yMa, float* yMi)
+Node* readNod(char* filename, float* xMa, float* yMa)
 {
     //Declarations
     Node puff;
     Node* nodes;
     int i, bSize = 100;
     int NodeCount = 0;
-    float xMax = FLT_MIN, yMax = FLT_MIN, xMin = FLT_MAX, yMin = FLT_MAX;
+    float xMax = FLT_MIN, yMax = FLT_MIN;
 
     FILE* f;
 
@@ -83,9 +31,7 @@ Node* readNod(char* filename, float* xMa, float* xMi, float* yMa, float* yMi)
             fscanf(f,"\t%hu", puff.SgmList + i);
 
         if(puff.x > xMax) xMax = puff.x;
-        if(puff.x < xMin) xMin = puff.x;
         if(puff.y > yMax) yMax = puff.y;
-        if(puff.y < yMin) yMin = puff.y;
 
         /*printf("\n%d\t%f\t%f\t%hu", NodeCount, puff.x, puff.y, puff.NumSegm);
         for (i=0;i<puff.NumSegm;i++)
@@ -94,7 +40,10 @@ Node* readNod(char* filename, float* xMa, float* xMi, float* yMa, float* yMi)
         //Checking if the allocated memory is enough, and if not, increasing the allocated space
         if(NodeCount > bSize - 1){
             bSize += 100;
-            realloc(nodes, bSize);
+            if(!realloc(nodes, bSize * sizeof(Node))){
+                fprintf(stderr,"Could not allocate memory!");
+                exit(2);
+            }
         }
 
         //Copying the path from puffer to the allocated memory
@@ -106,9 +55,7 @@ Node* readNod(char* filename, float* xMa, float* xMi, float* yMa, float* yMi)
     fclose(f);
 
     *yMa = yMax;
-    *yMi = yMin;
     *xMa = xMax;
-    *xMi = xMin;
 
     return nodes;
 }
@@ -140,8 +87,10 @@ Segment* readSgm(char* filename)
 
         //Checking if the allocated memory is enough, and if not, increasing the allocated space
         if(SegmentCount > bSize - 1){
-            bSize += 100;
-            realloc(segments, bSize);
+            if(!realloc(segments, bSize * sizeof(Segment))){
+                fprintf(stderr,"Could not allocate memory!");
+                exit(2);
+            }
         }
 
         //Copying the path from puffer to the allocated memory
@@ -157,7 +106,7 @@ Segment* readSgm(char* filename)
     return segments;
 }
 
-void readInputs(Node** nodes, Segment** segments, int* carsInSim, char* pth, int* jmp, int* rnd, int* TMax,  float* xMa, float* xMi, float* yMa, float* yMi){
+void readInputs(Node** nodes, Segment** segments, int* carsInSim, char* pth, int* jmp, int* rnd, int* TMax,  float* xMa, float* yMa, float* R){
     FILE* fin;
 
     char nod[20], sgm[20];
@@ -170,12 +119,12 @@ void readInputs(Node** nodes, Segment** segments, int* carsInSim, char* pth, int
 
     char trash[100];
 
-    fscanf(fin,"%s\n%s\n%s\n%s%d\n%s%d\n%s%d\n%s%d\n", nod, sgm, pth, trash, carsInSim, trash, jmp, trash, rnd, trash, TMax);
+    fscanf(fin,"%s\n%s\n%s\n%s%d\n%s%d\n%s%d\n%s%d\n%s%fl\n", nod, sgm, pth, trash, carsInSim, trash, jmp, trash, rnd, trash, TMax, trash, R);
 
     //printf("%s\n%s\n%s\n%d\n%d\n", nod, sgm, pth, *carsInSim, *jmp);
 
     fclose(fin);
 
-    *nodes = readNod(nod, xMa, xMi, yMa, yMi);
+    *nodes = readNod(nod, xMa, yMa);
     *segments = readSgm(sgm);
 }
