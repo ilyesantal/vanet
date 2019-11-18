@@ -45,8 +45,6 @@ int main()
             CARS[j].Pos++;
         }
 
-
-
         if(t == 0){
             CARS[0].ITS=0;
             CARS[0].IPos[0]=CARS[0].PathXY[2*CARS[0].Pos];
