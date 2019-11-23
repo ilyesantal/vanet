@@ -46,10 +46,10 @@
 1573909427 /home/antimanti/Project/vanet/pathConverter.h
 	<math.h>
 
-1574109656 source:/home/anti/Project/vanet/main.c
+1574203918 source:/home/anti/Project/vanet/main.c
 	"traffic.h"
 
-1574098412 /home/anti/Project/vanet/structs.h
+1574203930 /home/anti/Project/vanet/structs.h
 
 1574104838 /home/anti/Project/vanet/readFromFiles.h
 	<stdio.h>
@@ -64,7 +64,7 @@
 1574107283 /home/anti/Project/vanet/pathConverter.h
 	<math.h>
 
-1574109846 /home/anti/Project/vanet/traffic.h
+1574205158 /home/anti/Project/vanet/traffic.h
 	<stdio.h>
 	<stdlib.h>
 	<float.h>

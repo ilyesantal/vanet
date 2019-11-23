@@ -6,8 +6,7 @@
 #include "structs.h"
 
 
-Node* readNod(char* filename, float* xMa, float* yMa)
-{
+Node* readNod(char* filename, float* xMa, float* yMa){
     //Declarations
     Node puff;
     Node* nodes;
@@ -25,7 +24,7 @@ Node* readNod(char* filename, float* xMa, float* yMa)
     }
 
     //Allocating memory for *MaxSize* nodes
-    nodes = malloc(bSize*sizeof(Node));
+    nodes = (Node*)malloc(bSize*sizeof(Node));
 
     //Reading the lines from input file to a buffer
     while((fscanf(f, "\n%f\t%f\t%hu", &puff.x, &puff.y, &puff.NumSegm)) != EOF)
@@ -64,8 +63,7 @@ Node* readNod(char* filename, float* xMa, float* yMa)
     return nodes;
 }
 
-Segment* readSgm(char* filename)
-{
+Segment* readSgm(char* filename){
     //Declarations
     Segment puff;
     Segment* segments;
@@ -81,7 +79,7 @@ Segment* readSgm(char* filename)
     }
 
     //Allocating memory for *MaxSize* segments
-    segments = malloc(bSize*sizeof(Segment));
+    segments = (Segment*)malloc(bSize*sizeof(Segment));
 
     //Reading the lines from input file to a buffer
     while((fscanf(f, "%hu\t%hu\t%hu\n", &puff.N1, &puff.N2, &puff.type)) != EOF)
@@ -173,7 +171,7 @@ float* createPoints(Node *nodes, Segment segment, int *prevend, int *addedPoints
     ey = y/time;
 
     //Allocating memory for the array to return
-    segmentXY = malloc(points * sizeof(float) * 2);
+    segmentXY = (float*)malloc(points * sizeof(float) * 2);
     //Saving the start point of the segment
     if(segment.N1 == *prevend)
     {
@@ -217,29 +215,45 @@ float* createPoints(Node *nodes, Segment segment, int *prevend, int *addedPoints
     return segmentXY;
 }
 
-float* convertPath(Path* path, Node* nodes, Segment* segments){
+float* convertPath(Path* path, Node* nodes, Segment* segments, int* pno){
     //Declarations
-    int addedPoints, i;
+    int addedPoints, i, j, psize = 100, pn = 0;
     float segmentLength, timeRequired;
     float remainingFromPrevious = 0;
-    float *segmentPoints;
+    float *segmentPoints = NULL, *PathXY = NULL;
     int prevend = path->Start;
+
+    PathXY = (float*) malloc(psize * sizeof(float));
 
     for(i = 0; i < path->NSegm; i++)     //Going through the segments in the path
     {
         //Calling the function to convert the segments to points
         segmentPoints = createPoints(nodes, segments[path->SgmList[i]], &prevend, &addedPoints, &remainingFromPrevious, &segmentLength, &timeRequired);
 
+        if(pn + addedPoints > psize){
+            psize = pn + addedPoints;
+            PathXY = realloc(PathXY, psize * sizeof(float));
+        }
+
+        for(j = 0; j < addedPoints; j++)
+        {
+            PathXY[pn + j] = segmentPoints[j];
+        }
+
+        pn += addedPoints;
+
         path->Duration += timeRequired;
         path->Length += segmentLength;
     }
 
-    return segmentPoints;
+    *pno = pn;
+
+    return PathXY;
 }
 
 Car getNextCar(int carsInSim, FILE** paths, Node* nodes, Segment* segments, int n){
     static int carId = 0;
-    int i;
+    int i, pn;
     Path path;
     Car car;
 
@@ -256,7 +270,7 @@ Car getNextCar(int carsInSim, FILE** paths, Node* nodes, Segment* segments, int 
         }
     }
 
-    fscanf(*paths, "\n%hu\n%hu", &path.Start, &path.NSegm);
+    sscanf(line, "\n%hu\n%hu", &path.Start, &path.NSegm);
     //printf("%hu, %hu\n", path.Start, path.NSegm);
     path.SgmList = malloc(path.NSegm*sizeof(unsigned short));
     for (i=0; i<path.NSegm; i++){
@@ -264,20 +278,18 @@ Car getNextCar(int carsInSim, FILE** paths, Node* nodes, Segment* segments, int 
     }
     //printf("\n");
 
-    car.PathXY = convertPath(&path, nodes, segments);
+    car.PathXY = convertPath(&path, nodes, segments, &pn);
     car.Pos = 0;
-    car.NumNb = 0;
     car.CarID = carId++;
-    car.NbList = malloc(carsInSim * sizeof(short int));
     car.ITS = -1;
     car.IPos[0] = 0;
     car.IPos[1] = 0;
-    car.PathLen = path.Length;
+    car.PathLen = pn;
 
     return car;
 }
 
-void updateCells(Cell** cells, Car car, float R, float xMax, float yMax){
+void updateCells(Cell* cells, Car car, float R, float xMax, float yMax){
     float x, y;
     int index;
     x = car.PathXY[2 * car.Pos];
@@ -285,13 +297,13 @@ void updateCells(Cell** cells, Car car, float R, float xMax, float yMax){
 
     index = (y * xMax + x) / R;
 
-    cells[index]->NCC++;
-    if(cells[index]->NCC >= cells[index]->SCC){
-        cells[index]->SCC += 10;
-        if(!realloc(cells[index]->CellCars, cells[index]->SCC * sizeof(unsigned short))){
+    cells[index].NCC++;
+    if(cells[index].NCC >= cells[index].SCC){
+        cells[index].SCC += 10;
+        if(!realloc(cells[index].CellCars, cells[index].SCC * sizeof(unsigned short))){
             fprintf(stderr, "Could not allocate memory!\n");
             exit(2);
         }
-        cells[index]->CellCars[cells[index]->NCC] = car.CarID;
+        cells[index].CellCars[cells[index].NCC] = car.CarID;
     }
 }

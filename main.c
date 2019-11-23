@@ -39,9 +39,10 @@ int main()
     for(t = -500; t < TMax; t++){
         for(j = 0; j < carsInSim; j++){
             if(CARS[j].Pos == CARS[j].PathLen){
+                free(CARS[j].PathXY);
                 CARS[j] = getNextCar(carsInSim, &paths, NODES, SEGMENTS, jmp);
             }
-            updateCells(&CELLS, CARS[j], R, xMax, yMax);
+            updateCells(CELLS, CARS[j], R, xMax, yMax);
             CARS[j].Pos++;
         }
 

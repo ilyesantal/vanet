@@ -24,8 +24,6 @@ typedef struct {
     unsigned short PathLen; // Length of PathXY array in position units (2 floats)
     unsigned short Pos; // Index of PathXY to tell the actual position (x=PathXY[2*Pos], y=PathXY[2*Pos+1])
     float *PathXY; // List of positions (x-y) alog the path separated by 1 second
-    short int NumNb; // Number of cars (neighbors) within a finite distance from this car
-    short int *NbList; // List of cars IDs, who are around the given car (list of neighbors)
     short int ITS; // List of latest Information Time Stamps received from other vehicles (-1:invalid, no info) (méret>Nc)
     float IPos[2]; // The position of the agent, when it became informed (x-y coordinate)
 } Car;
